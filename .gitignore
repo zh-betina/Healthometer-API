@@ -1,3 +1,5 @@
 logs
 Dependencies
 .env
+bin
+obj
