@@ -22,11 +22,11 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Docs\TestUser" />
+      <Content Include=".github\workflows\build.yml" />
     </ItemGroup>
 
     <ItemGroup>
-      <Content Include=".github\workflows\build.yml" />
+      <Folder Include="Docs" />
     </ItemGroup>
 
 </Project>

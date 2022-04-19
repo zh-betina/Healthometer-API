@@ -11,9 +11,10 @@ namespace Healthometer_API.Services;
 public class UploadFileService
 {
     private readonly IMongoCollection<User> _documentsCollection;
-
+    private readonly DocumentsService _documentsService;
+    
     public UploadFileService(
-        IOptions<UsersDatabaseSettings> usersDatabaseSettings)
+        IOptions<UsersDatabaseSettings> usersDatabaseSettings, DocumentsService documentsService)
     {
         var mongoClient = new MongoClient(
             usersDatabaseSettings.Value.ConnectionString);
@@ -23,9 +24,11 @@ public class UploadFileService
 
         _documentsCollection = mongoDatabase.GetCollection<User>(
             usersDatabaseSettings.Value.UsersCollectionName);
+        
+        _documentsService = documentsService;
     }
 
-    public void CreateDirectoryForUser(string userId)
+    private void CreateDirectoryForUser(string userId)
     {
         var allUsersDir = Path.Combine(Directory.GetCurrentDirectory(), "Docs");
         var userDir = Path.Combine(allUsersDir, userId);
@@ -33,21 +36,23 @@ public class UploadFileService
         if (Directory.Exists(userDir)) return;
         Directory.CreateDirectory(userDir);
     }
-
-    public async Task<string> OnPostUploadAsync(DocFile file)
+    public async Task<string> OnPostUploadAsync(string userId, IFormFile docFile, Document docInfo)
     {
-        var docInfo = file.Doc;
-        var docFile = file.FileContent;
-        Console.WriteLine("TEST");
-        var folderName = Path.Combine("Docs", "TestUser");
+        CreateDirectoryForUser(userId);
+        
+        var randomName = Path.GetRandomFileName();
+        var folderName = Path.Combine("Docs", userId, randomName);
         var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
-        if (docFile.Length <= 0) return "not Ok";
-        var fileName = ContentDispositionHeaderValue.Parse(docFile.ContentDisposition).FileName.Trim('"');
-        var fullPath = Path.Combine(pathToSave, fileName);
-        var dbPath = Path.Combine(folderName, fileName);
-        Console.WriteLine(docInfo);
-        await using var stream = new FileStream(fullPath, FileMode.Create);
-        docFile.CopyTo(stream);
-        return "Ok";
+        
+        if (docFile.Length > 0)
+        {
+            await using var stream = new FileStream(pathToSave, FileMode.Create);
+            docFile.CopyTo(stream);
+
+            await _documentsService.PutAsync(userId, docInfo);
+        
+            return "ok";
+        }
+        return "Not ok";
     }
 }
