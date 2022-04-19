@@ -35,4 +35,15 @@ public class DocumentsService
         await _documentsCollection.FindOneAndUpdateAsync(
             user => user.Id == id, Builders<User>.Update.Push("docs", newDocument)
             );
+
+    public async Task<User>? DeleteAsync(string userId, string docId)
+    {
+        var filter = new BsonDocument("_id", ObjectId.Parse(userId));
+        var update = Builders<User>.Update.PullFilter("docs",
+            Builders<Document>.Filter.Eq(doc => doc.Id, docId));
+        var result = await _documentsCollection.FindOneAndUpdateAsync(filter, update);
+        return result;
+    }
+
+    
 }

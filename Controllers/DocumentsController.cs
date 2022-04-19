@@ -35,4 +35,10 @@ public class DocumentsController : ControllerBase
         return CreatedAtAction(nameof(Put), new {newDocument});
     }
 
+    [HttpDelete]
+    public async Task<IActionResult> Delete(string userId, string docId)
+    {
+        await _documentsService.DeleteAsync(userId, docId);
+        return CreatedAtAction(nameof(Delete), new {docId});
+    }
 }
