@@ -45,5 +45,15 @@ public class DocumentsService
         return result;
     }
 
+    public async Task<UpdateResult>? ModifyAsync(string userId, string docId, Document modifiedDocument)
+    {
+        var filter = Builders<User>.Filter.Eq(user => user.Id, userId)
+                     & Builders<User>.Filter.ElemMatch(user => user.Docs, Builders<Document>.Filter.Eq(document =>
+                         document.Id, docId));
+        var update = Builders<User>.Update.Set(user => user.Docs[-1], modifiedDocument);
+        var result = await _documentsCollection.UpdateOneAsync(filter, update);
+        return result;
+    }
+
     
 }

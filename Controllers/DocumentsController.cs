@@ -41,4 +41,11 @@ public class DocumentsController : ControllerBase
         await _documentsService.DeleteAsync(userId, docId);
         return CreatedAtAction(nameof(Delete), new {docId});
     }
+
+    [HttpPatch]
+    public async Task<IActionResult> Patch(string userId, string docId, Document modifiedDocument)
+    {
+        await _documentsService.ModifyAsync(userId, docId, modifiedDocument);
+        return Ok();
+    }
 }
