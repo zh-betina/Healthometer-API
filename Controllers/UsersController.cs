@@ -35,7 +35,6 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> Post(User newUser)
     {
         await _usersService.CreateAsync(newUser);
-
         return CreatedAtAction(nameof(Get), new {id = newUser.Id}, newUser);
     }
 

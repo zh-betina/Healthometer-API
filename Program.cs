@@ -9,6 +9,7 @@ builder.Services.Configure<UsersDatabaseSettings>(
     builder.Configuration.GetSection("HealthometerDatabase")
 );
 builder.Services.AddSingleton<UsersService>();
+builder.Services.AddSingleton<DocumentsService>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -16,11 +17,10 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", 
+    options.AddPolicy("AllowAll",
         b => b.AllowAnyHeader()
             .AllowAnyMethod()
-            .AllowAnyOrigin()
-            .AllowCredentials());
+            .AllowAnyOrigin());
 });
 
 builder.Host.UseSerilog((context, loggerConf) =>

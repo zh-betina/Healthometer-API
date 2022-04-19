@@ -14,5 +14,6 @@ public class User
     [BsonElement("name")] public string? Name { get; set; }
     [BsonElement("password")] public string? Password { get; set; }
     [BsonElement("phone_no")] public string? PhoneNo { get; set; }
-    [BsonElement("lang")] public string? Lang { get; set; }
+    [BsonElement("lang")] public string? Lang { get; set; } 
+    [BsonElement("docs")] public List<Document> Docs { get; set; } = null;
 }
