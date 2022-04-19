@@ -21,4 +21,12 @@
         <PackageReference Include="System.Linq" Version="4.3.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Docs\TestUser" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include=".github\workflows\build.yml" />
+    </ItemGroup>
+
 </Project>
