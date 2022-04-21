@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using Healthometer_API.Models;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;

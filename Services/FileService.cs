@@ -6,12 +6,12 @@ using File = Healthometer_API.Models.DocFile;
 
 namespace Healthometer_API.Services;
 
-public class UploadFileService
+public class FileService
 {
     private readonly IMongoCollection<User> _documentsCollection;
     private readonly DocumentsService _documentsService;
     
-    public UploadFileService(
+    public FileService(
         IOptions<UsersDatabaseSettings> usersDatabaseSettings, DocumentsService documentsService)
     {
         var mongoClient = new MongoClient(

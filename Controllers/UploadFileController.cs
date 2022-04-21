@@ -8,10 +8,10 @@ namespace Healthometer_API.Controllers;
 [Route("api/[controller]")]
 public class UploadFileController : ControllerBase
 {
-    private readonly UploadFileService _uploadFileService;
+    private readonly FileService _fileService;
     
-    public UploadFileController(UploadFileService uploadFileService) =>
-        _uploadFileService = uploadFileService;
+    public UploadFileController(FileService fileService) =>
+        _fileService = fileService;
 
     [HttpPost]
     public async Task<IActionResult> Post([FromForm] DocFile file)
@@ -24,7 +24,7 @@ public class UploadFileController : ControllerBase
         if (docFile.Length == 0) throw new Exception("File is empty");
         if (userId == null) throw new Exception("User id is missing");
 
-        await _uploadFileService.OnPostUploadAsync(userId, docFile, docInfo);
+        await _fileService.OnPostUploadAsync(userId, docFile, docInfo);
         return CreatedAtAction(nameof(Post), new {docFile});
     }
 }
