@@ -11,6 +11,7 @@ builder.Services.Configure<UsersDatabaseSettings>(
 builder.Services.AddSingleton<UsersService>();
 builder.Services.AddSingleton<DocumentsService>();
 builder.Services.AddSingleton<FileService>();
+builder.Services.AddSingleton<CategoriesService>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

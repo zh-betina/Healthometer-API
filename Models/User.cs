@@ -18,4 +18,5 @@ public class User
     [BsonElement("icon")] public string? Icon { get; set; }
     [BsonElement("taken_space")] public float? TakenSpace { get; set; }
     [BsonElement("docs")] public List<Document> Docs { get; set; } = null;
+    [BsonElement("categories")] public List<string> Categories { get; set; } = new List<string>();
 }

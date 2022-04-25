@@ -1,8 +1,5 @@
-using System.Collections.Immutable;
 using Healthometer_API.Models;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.Options;
-using Microsoft.OpenApi.Any;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
