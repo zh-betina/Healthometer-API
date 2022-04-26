@@ -34,8 +34,21 @@ public class UsersController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Post(User newUser)
     {
-        await _usersService.CreateAsync(newUser);
-        return CreatedAtAction(nameof(Get), new {id = newUser.Id}, newUser);
+        //TODO add checking if the user with the email exists already
+        try
+        {
+            var requestResult = await _usersService.CreateAsync(newUser);
+            if (requestResult == 1)
+            {
+               return new OkObjectResult(new { status = 201, msg = "The user was created" });
+            }
+
+            return new BadRequestObjectResult(new {status = 400, msg = "One of the values is missing"});
+        }
+        catch (Exception e)
+        {
+            return new JsonResult(new {status = 500, msg = "DB operation has failed. Try again"});
+        }
     }
 
     [HttpDelete]
