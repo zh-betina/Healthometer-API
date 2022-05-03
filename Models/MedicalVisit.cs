@@ -12,5 +12,5 @@ public class MedicalVisit
     [BsonElement("name")] public string? Name { get; set; } = null;
     [BsonElement("category")] public string? Category { get; set; } = null;
     [BsonElement("date")] public DateTime? Date { get; set; }
-    [BsonElement("notification")] public string Notification { get; set; }
+    [BsonElement("notification")] public string? Notification { get; set; }
 }

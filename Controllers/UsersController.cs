@@ -47,6 +47,8 @@ public class UsersController : ControllerBase
         }
         catch (Exception e)
         {
+            Console.WriteLine(e);
+            Console.WriteLine();
             return new JsonResult(new {status = 500, msg = "DB operation has failed. Try again"});
         }
     }

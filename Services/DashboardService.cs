@@ -31,7 +31,8 @@ public class DashboardService
             RegularVisits = user.MedicalVisits,
             TakenSpace = user.TakenSpace,
             Documents = user.Docs,
-            Family = user.FamilyMembers
+            Family = user.FamilyMembers,
+            UserName = user.Name
         };
 
         return dashboard;

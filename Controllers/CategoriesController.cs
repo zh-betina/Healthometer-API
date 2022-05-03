@@ -10,7 +10,7 @@ public class CategoriesController : ControllerBase
 {
     private readonly CategoriesService _categoriesService;
 
-    public CategoriesController(CategoriesService categoriesService) =>
+    public CategoriesController(CategoriesService? categoriesService) =>
         _categoriesService = categoriesService;
 
     [HttpGet("{id:length(24)}")]

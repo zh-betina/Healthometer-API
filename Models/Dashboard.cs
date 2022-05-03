@@ -6,4 +6,5 @@ public class Dashboard
     public float? TakenSpace { set; get; }
     public List<Document> Documents { set; get; }
     public List<FamilyMember> Family { get; set; }
+    public string UserName { get; set; }
 }
