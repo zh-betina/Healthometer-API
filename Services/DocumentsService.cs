@@ -96,6 +96,4 @@ public class DocumentsService
         var result = await _documentsCollection.UpdateOneAsync(filter, update);
         return result;
     }
-
-    
 }

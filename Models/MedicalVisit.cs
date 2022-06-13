@@ -15,4 +15,5 @@ public class MedicalVisit
     [BsonElement("notification")] public Notification? Notification { get; set; } = Models.Notification.Day1;
     [BsonElement("isRegular")] public bool IsRegular { get; set; } = false;
     [BsonElement("regularity")] public int? Regularity { get; set; }
+    [BsonElement("isDone")] public bool? IsDone { get; set; } = false;
 }

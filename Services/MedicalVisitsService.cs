@@ -32,4 +32,36 @@ public class MedicalVisitsService
             return result;
     }
 
+    public async Task<List<MedicalVisit>> GetAsync(string userId, string? familyMemberId, bool? isRegular, bool? isDone)
+    {
+        var user = await _visitsCollection
+            .Find(e => e.Id == userId)
+            .FirstOrDefaultAsync();
+        var medicalVisits = user.MedicalVisits;
+
+        if (isRegular is true)
+        {
+            medicalVisits = sortOutRegularVisits(medicalVisits);
+        }
+        return medicalVisits;
+    }
+
+    public List<MedicalVisit> sortOutRegularVisits (List<MedicalVisit> visits)
+    {
+        List<MedicalVisit> filteredVisits = new List<MedicalVisit>();
+        
+        if (visits != null && visits.Count() > 0)
+        {
+            foreach (var visit in visits)
+            {
+                if (visit.IsRegular)
+                {
+                    filteredVisits.Add(visit);
+                }
+            }
+        }
+
+        return filteredVisits;
+    }
+
 }

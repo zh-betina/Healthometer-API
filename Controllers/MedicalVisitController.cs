@@ -13,6 +13,19 @@ public class MedicalVisitController : ControllerBase
         public MedicalVisitController(MedicalVisitsService medicalVisitsService) =>
                 _visitsService = medicalVisitsService;
 
+        [HttpGet("{id:length(24)}")]
+        public async Task<ActionResult<List<MedicalVisit>>> Get(string id, string? familyMemberId, bool? isRegular, bool? isDone)
+        {
+                var visits = await _visitsService.GetAsync(id, familyMemberId, isRegular, isDone);
+
+                if (visits is null)
+                {
+                        return NoContent();
+                }
+
+                return visits;
+        }
+
         [HttpPost("{id:length(24)}")]
         public async Task<IActionResult> Post(string id, MedicalVisit newVisit, string? familyMember)
         {

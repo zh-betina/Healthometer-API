@@ -8,9 +8,10 @@ namespace Healthometer_API.Services;
 public class DashboardService
 {
     private readonly IMongoCollection<User> _usersCollection;
+    private readonly MedicalVisitsService _visitsService;
 
     public DashboardService (
-        IOptions<UsersDatabaseSettings> usersDatabaseSettings)
+        IOptions<UsersDatabaseSettings> usersDatabaseSettings, MedicalVisitsService visitsService)
     {
         var mongoClient = new MongoClient(
             usersDatabaseSettings.Value.ConnectionString);
@@ -20,15 +21,17 @@ public class DashboardService
         
         _usersCollection = mongoDatabase.GetCollection<User>(
             usersDatabaseSettings.Value.UsersCollectionName);
+
+        _visitsService = visitsService;
     }
 
     public async Task<Dashboard> GetAsync(string userId)
     {
         var user = await _usersCollection.Find(x => x.Id == userId).FirstOrDefaultAsync();
-        //TODO Need to sort out the visits that are regular
-        var dashboard = new Dashboard
+        List<MedicalVisit> regularVisits = _visitsService.sortOutRegularVisits(user.MedicalVisits);
+        Dashboard dashboard = new Dashboard
         {
-            RegularVisits = user.MedicalVisits,
+            RegularVisits = regularVisits,
             TakenSpace = user.TakenSpace,
             Documents = user.Docs,
             Family = user.FamilyMembers,
