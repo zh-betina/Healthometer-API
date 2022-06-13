@@ -1,7 +1,6 @@
 using Healthometer_API.Models;
 using Healthometer_API.Services;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Bson;
 
 namespace Healthometer_API.Controllers;
 
@@ -28,11 +27,11 @@ public class DocumentsController : ControllerBase
         return documents;
     }
 
-    [HttpPut]
-    public async Task<IActionResult> Put(string id, Document newDocument)
+    [HttpPost("{id:length(24)}")]
+    public async Task<IActionResult> Post(string id, Document newDocument)
     {
-        await _documentsService.PutAsync(id, newDocument);
-        return CreatedAtAction(nameof(Put), new {newDocument});
+        await _documentsService.PostAsync(id, newDocument);
+        return CreatedAtAction(nameof(Post), new {newDocument});
     }
 
     [HttpDelete]

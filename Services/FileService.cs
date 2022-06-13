@@ -1,6 +1,5 @@
 using Healthometer_API.Models;
 using Microsoft.Extensions.Options;
-using MongoDB.Bson;
 using MongoDB.Driver;
 using File = Healthometer_API.Models.DocFile;
 
@@ -52,22 +51,7 @@ public class FileService
 
         return false;
     }
-    private Document PrepareDocInfoForDatabase(Document docInfo, string format, string path)
-    {
-        var docToSendToDb = new Document
-        {
-            Id = ObjectId.GenerateNewId().ToString(),
-            Format = format,
-            Path = path,
-            Date = docInfo.Date,
-            Category = docInfo.Category,
-            Name = docInfo.Name,
-            Status = docInfo.Status
-        };
-
-        return docToSendToDb;
-    }
-    public async Task<string> OnPostUploadAsync(string userId, IFormFile docFile, Document docInfo)
+    public async Task<Object> OnPostUploadAsync(string userId, IFormFile docFile)
     {
         _user = userId;
         CreateDirectoryForUser();
@@ -88,12 +72,9 @@ public class FileService
                 await using var stream = new FileStream(pathToSave, FileMode.Create);
                 docFile.CopyTo(stream);
 
-                var docInfoForDatabase = PrepareDocInfoForDatabase(docInfo, fileExtension, pathToSave);
                 UpdateTakenSpace("sth", fileSize);
-                await _documentsService.PutAsync(userId, docInfoForDatabase);
-            
-        
-                return "ok";
+                var response = new {format = fileExtension, path = pathToSave};
+                return response;
             }
 
             return "Not enough space";

@@ -4,11 +4,12 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace Healthometer_API.Services;
+
 public class DocumentsService
 {
     private readonly IMongoCollection<User> _documentsCollection;
 
-    public DocumentsService (
+    public DocumentsService(
         IOptions<UsersDatabaseSettings> usersDatabaseSettings)
     {
         var mongoClient = new MongoClient(
@@ -16,12 +17,28 @@ public class DocumentsService
 
         var mongoDatabase = mongoClient.GetDatabase(
             usersDatabaseSettings.Value.DatabaseName);
-        
+
         _documentsCollection = mongoDatabase.GetCollection<User>(
             usersDatabaseSettings.Value.UsersCollectionName);
 
     }
     
+    private Document PrepareDocInfoForDatabase(Document docInfo)
+    {
+        var docToSendToDb = new Document
+        {
+            Id = ObjectId.GenerateNewId().ToString(),
+            Format = docInfo.Format,
+            Path = docInfo.Path,
+            Date = docInfo.Date,
+            Category = docInfo.Category,
+            Name = docInfo.Name,
+            Status = docInfo.Status
+        };
+
+        return docToSendToDb;
+    }
+
     public async Task<List<Document>>? GetAsync(string id)
     {
         var user = await _documentsCollection
@@ -31,11 +48,16 @@ public class DocumentsService
         return docs;
     }
 
-    public async Task<User>? PutAsync(string id, Document newDocument) =>
-        await _documentsCollection.FindOneAndUpdateAsync(
-            user => user.Id == id, Builders<User>.Update.Push("docs", newDocument)
-            );
-
+    public async Task<User>? PostAsync(string id, Document newDocument)
+    {
+        var docInfoForDatabase = PrepareDocInfoForDatabase(newDocument);
+        var result = await _documentsCollection.FindOneAndUpdateAsync(
+            user => user.Id == id, Builders<User>.Update.Push("docs", docInfoForDatabase)
+        );
+        
+        return result;
+    }
+    
     public async Task<User>? DeleteAsync(string userId, string docId)
     {
         

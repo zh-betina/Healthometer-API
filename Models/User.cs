@@ -14,7 +14,7 @@ public class User
     [BsonElement("name")] public string? Name { get; set; }
     [BsonElement("password")] public string? Password { get; set; }
     [BsonElement("phone_no")] public string? PhoneNo { get; set; }
-    [BsonElement("lang")] public Language? Language = Models.Language.EN;
+    [BsonElement("lang")] public Language? Language = Models.Language.En;
     [BsonElement("icon")] public string? Icon { get; set; } = "";
     [BsonElement("taken_space")] public long? TakenSpace { get; set; } = 0;
     [BsonElement("docs")] public List<Document> Docs { get; set; } = new List<Document>();

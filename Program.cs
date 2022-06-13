@@ -13,6 +13,7 @@ builder.Services.AddSingleton<DocumentsService>();
 builder.Services.AddSingleton<FileService>();
 builder.Services.AddSingleton<CategoriesService>();
 builder.Services.AddSingleton<DashboardService>();
+builder.Services.AddSingleton<MedicalVisitsService>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
