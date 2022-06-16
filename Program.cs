@@ -4,7 +4,7 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Add servicicon Regular visitses to the container.
 builder.Services.Configure<UsersDatabaseSettings>(
     builder.Configuration.GetSection("HealthometerDatabase")
 );

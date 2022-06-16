@@ -1,5 +1,7 @@
+using System.Collections.ObjectModel;
 using Healthometer_API.Models;
 using Microsoft.Extensions.Options;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace Healthometer_API.Services;
@@ -64,4 +66,18 @@ public class MedicalVisitsService
         return filteredVisits;
     }
 
+    public async Task<string> PatchAsync(string userId, string medicalVisitId)
+    {
+        var filter = Builders<User>.Filter;
+        var userIdAndVisitFilter = filter.And(
+            filter.Eq(user => user.Id, userId),
+            filter.ElemMatch(user => user.MedicalVisits, visit => visit.Id == medicalVisitId));
+        var user = await _visitsCollection.Find(userIdAndVisitFilter).SingleOrDefaultAsync();
+
+        var update = Builders<User>.Update;
+        var isDoneSetter = update.Set("medical_visits.$.isDone", true);
+        await _visitsCollection.UpdateOneAsync(userIdAndVisitFilter, isDoneSetter);
+        
+        return "Ok";
+    }
 }

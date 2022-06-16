@@ -32,4 +32,11 @@ public class MedicalVisitController : ControllerBase
                 await _visitsService.PostAsync(id, newVisit, familyMember);
                 return CreatedAtAction(nameof(Post), new {newVisit});
         }
+
+        [HttpPatch]
+        public async Task<IActionResult> Patch(string userId, string medicalVisitId)
+        {
+                await _visitsService.PatchAsync(userId, medicalVisitId);
+                return CreatedAtAction(nameof(Patch), new { });
+        }
 }
