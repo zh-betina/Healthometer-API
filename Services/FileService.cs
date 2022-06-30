@@ -1,5 +1,6 @@
 using Healthometer_API.Models;
 using Microsoft.Extensions.Options;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using File = Healthometer_API.Models.DocFile;
 
@@ -51,35 +52,45 @@ public class FileService
 
         return false;
     }
-    public async Task<Object> OnPostUploadAsync(string userId, IFormFile docFile)
+    public async Task<Document> OnPostUploadAsync(string userId, DocFile docFile)
     {
         _user = userId;
         CreateDirectoryForUser();
-        
+        IFormFile file = docFile.FileContent;
         var randomName = Path.GetRandomFileName();
         var folderName = Path.Combine("Docs", userId, randomName);
         var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
 
-        var fileExtension = Path.GetExtension(docFile.FileName);
-        long fileSize = docFile.Length;
+        var fileExtension = Path.GetExtension(file.FileName);
+        long fileSize = file.Length;
 
         //TODO refactor: should rather first check if size will be ok and then try to insert the file
-        if (docFile.Length > 0)
+        if (file.Length > 0)
         {
             var takenSpaceUpdateResult = await UpdateTakenSpace("sth", fileSize);
             if (takenSpaceUpdateResult)
             {
                 await using var stream = new FileStream(pathToSave, FileMode.Create);
-                docFile.CopyTo(stream);
+                file.CopyTo(stream);
 
                 UpdateTakenSpace("sth", fileSize);
-                var response = new {format = fileExtension, path = pathToSave};
-                return response;
+                Document doc = new Document
+                {
+                    Id = ObjectId.GenerateNewId().ToString(),
+                    Format = fileExtension,
+                    Path = pathToSave,
+                    Date = docFile.documentInfo.Date,
+                    Category = docFile.documentInfo.Category,
+                    Name = docFile.documentInfo.Name,
+                    Status = docFile.documentInfo.Status
+
+                };
+                return doc;
             }
 
-            return "Not enough space";
-
+            return new Document();
         }
-        return "Not ok";
+
+        return new Document();
     }
 }

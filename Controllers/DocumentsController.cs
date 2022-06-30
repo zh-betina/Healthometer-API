@@ -27,12 +27,13 @@ public class DocumentsController : ControllerBase
         return documents;
     }
 
-    [HttpPost("{id:length(24)}")]
-    public async Task<IActionResult> Post(string id, Document newDocument)
-    {
-        await _documentsService.PostAsync(id, newDocument);
-        return CreatedAtAction(nameof(Post), new {newDocument});
-    }
+    // [HttpPost("{id:length(24)}")]
+    // public async Task<IActionResult> Post(string id, Document newDocument)
+    // {
+    //     Console.WriteLine("docs reached");
+    //     await _documentsService.PostAsync(id, newDocument);
+    //     return CreatedAtAction(nameof(Post), new {newDocument});
+    // }
 
     [HttpDelete]
     public async Task<IActionResult> Delete(string userId, string docId)

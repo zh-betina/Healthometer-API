@@ -6,4 +6,6 @@ namespace Healthometer_API.Models;
 public class DocFile
 {
     public IFormFile? FileContent { get; set; }
+    public Document? documentInfo { get; set; }
+    
 }

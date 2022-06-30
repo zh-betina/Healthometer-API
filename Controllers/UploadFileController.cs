@@ -1,6 +1,7 @@
 using Healthometer_API.Models;
 using Microsoft.AspNetCore.Mvc;
 using Healthometer_API.Services;
+using MongoDB.Bson;
 
 namespace Healthometer_API.Controllers;
 
@@ -9,21 +10,26 @@ namespace Healthometer_API.Controllers;
 public class UploadFileController : ControllerBase
 {
     private readonly FileService _fileService;
-    
-    public UploadFileController(FileService fileService) =>
-        _fileService = fileService;
+    private readonly DocumentsService _documentsService;
 
-    [HttpPost("{id:length(24)}")]
-    public async Task<IActionResult> Post([FromForm] DocFile file, string id)
+    public UploadFileController(FileService fileService, DocumentsService docsService)
     {
-        
-        var docFile = file.FileContent;
+        _fileService = fileService;
+        _documentsService = docsService;
+    }
+    [HttpPost("{id:length(24)}")]
+    public async Task<string> Post([FromForm] DocFile fileForm, string id)
+    {
+        Console.WriteLine("upload file reached");
+        var docFile = fileForm.FileContent;
         var userId = id;
 
         if (docFile == null) throw new Exception("File is null");
         if (userId == null) throw new Exception("User id is missing");
 
-        var response = await _fileService.OnPostUploadAsync(userId, docFile);
-        return CreatedAtAction(nameof(Post), new {response});
+        var uploadResponse = await _fileService.OnPostUploadAsync(userId, fileForm);
+        var infoResponse = await _documentsService.PostAsync(uploadResponse, userId);
+        Console.WriteLine(infoResponse.ToJson());
+        return "ok";
     }
 }

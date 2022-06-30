@@ -23,7 +23,7 @@ public class DocumentsService
 
     }
     
-    private Document PrepareDocInfoForDatabase(Document docInfo)
+    public Document PrepareDocInfoForDatabase(Document docInfo)
     {
         var docToSendToDb = new Document
         {
@@ -48,16 +48,15 @@ public class DocumentsService
         return docs;
     }
 
-    public async Task<User>? PostAsync(string id, Document newDocument)
+    public async Task<User>? PostAsync(Document newDocument, string userId)
     {
         var docInfoForDatabase = PrepareDocInfoForDatabase(newDocument);
         var result = await _documentsCollection.FindOneAndUpdateAsync(
-            user => user.Id == id, Builders<User>.Update.Push("docs", docInfoForDatabase)
+            user => user.Id == userId, Builders<User>.Update.Push("docs", docInfoForDatabase)
         );
         
         return result;
     }
-    
     public async Task<User>? DeleteAsync(string userId, string docId)
     {
         
