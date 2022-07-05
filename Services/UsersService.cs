@@ -30,6 +30,7 @@ public class UsersService
     public async Task<int> CreateAsync(User newUser)
     {
         var condition = newUser.Name is not null & newUser.Email is not null & newUser.Password is not null;
+        newUser.Categories.Add("all");
         if (condition)
         {
             await _usersCollection.InsertOneAsync(newUser);

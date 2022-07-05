@@ -16,7 +16,7 @@ builder.Services.AddSingleton<DashboardService>();
 builder.Services.AddSingleton<MedicalVisitsService>();
 builder.Services.AddSingleton<FamilyMemberService>();
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

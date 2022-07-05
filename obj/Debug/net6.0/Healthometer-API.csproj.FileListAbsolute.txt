@@ -111,3 +111,4 @@
 /home/betina/RiderProjects/Healthometer-API/Healthometer-API/obj/Debug/net6.0/Healthometer-API.genruntimeconfig.cache
 /home/betina/RiderProjects/Healthometer-API/Healthometer-API/obj/Debug/net6.0/ref/Healthometer-API.dll
 /home/betina/RiderProjects/Healthometer-API/Healthometer-API/bin/Debug/net6.0/libmongocrypt.so
+/home/betina/RiderProjects/Healthometer-API/Healthometer-API/bin/Debug/net6.0/Newtonsoft.Json.dll

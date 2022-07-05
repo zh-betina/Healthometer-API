@@ -3,6 +3,8 @@ using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using File = Healthometer_API.Models.DocFile;
+using System.Text.Json;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Healthometer_API.Services;
 
@@ -56,7 +58,9 @@ public class FileService
     {
         _user = userId;
         CreateDirectoryForUser();
+        
         IFormFile file = docFile.FileContent;
+        var docInfo = docFile.DocumentInfo;
         var randomName = Path.GetRandomFileName();
         var folderName = Path.Combine("Docs", userId, randomName);
         var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
@@ -79,11 +83,11 @@ public class FileService
                     Id = ObjectId.GenerateNewId().ToString(),
                     Format = fileExtension,
                     Path = pathToSave,
-                    Date = docFile.documentInfo.Date,
-                    Category = docFile.documentInfo.Category,
-                    Name = docFile.documentInfo.Name,
-                    Status = docFile.documentInfo.Status
-
+                    Date = docInfo?.Date,
+                    Category = docInfo?.Category,
+                    Name = docInfo?.Name,
+                    Status = docInfo?.Status
+                
                 };
                 return doc;
             }
