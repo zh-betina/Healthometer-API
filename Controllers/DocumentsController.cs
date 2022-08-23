@@ -1,6 +1,7 @@
 using Healthometer_API.Models;
 using Healthometer_API.Services;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Bson;
 
 namespace Healthometer_API.Controllers;
 
@@ -28,10 +29,10 @@ public class DocumentsController : ControllerBase
     }
     
     [HttpDelete]
-    public async Task<IActionResult> Delete(string userId, string docId)
+    public async Task<CreatedAtActionResult> Delete(string userId, [FromBody] List<string> docsToRemove)
     {
-        await _documentsService.DeleteAsync(userId, docId);
-        return CreatedAtAction(nameof(Delete), new {docId});
+        await _documentsService.DeleteAsync(userId, docsToRemove);
+        return CreatedAtAction(nameof(Delete), new {docsToRemove});
     }
 
     [HttpPatch]

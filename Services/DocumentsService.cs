@@ -1,6 +1,8 @@
 using Healthometer_API.Models;
 using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Any;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 
 namespace Healthometer_API.Services;
@@ -57,33 +59,47 @@ public class DocumentsService
         
         return result;
     }
-    public async Task<User>? DeleteAsync(string userId, string docId)
+
+    public async Task<List<string>>? DeleteAsync(string userId, List<string> docsToRemove)
     {
-        
         //TODO refactor !
-        var userFilter = Builders<User>.Filter.Eq("_id", ObjectId.Parse(userId));
-        userFilter &= Builders<User>.Filter.ElemMatch(user => user.Docs, Builders<Document>.Filter.Eq(document =>
-            document.Id, docId));
+        List<string> result = new List<string>();
+    foreach(var docId in docsToRemove)
+    {
+        var docFilter = Builders<Document>.Filter.Eq(doc => doc.Id, docId);
 
-        var filter = new BsonDocument("_id", ObjectId.Parse(userId));
-        var update = Builders<User>.Update.PullFilter("docs",
-            Builders<Document>.Filter.Eq(doc => doc.Id, docId));
+        var doc = await _documentsCollection.Find(
+                Builders<User>.Filter.ElemMatch(el => el.Docs, docFilter))
+            .Project(
+                Builders<User>.Projection.Include(e => e.Docs)
+                    .Exclude(e => e.Id)
+                    .Exclude(e => e.Docs)
+                    .ElemMatch(user => user.Docs, docFilter)
+            ).SingleOrDefaultAsync();
 
-        var docEntry = await _documentsCollection
-            .Find(userFilter).FirstOrDefaultAsync();
-        var test = docEntry.Docs.ToList();
-
-        var docIndex = test.FindIndex(doc => doc.Id == docId);
+        BsonValue docs = doc["docs"];
+        List<Document> docObj = BsonSerializer.Deserialize<List<Document>>(docs.ToJson());
+        var filePath = docObj[0].Path;
         
-        if (docIndex > -1)
-        {
-            var pathFileToDelete = test[docIndex].Path;
-            if (pathFileToDelete is not null) File.Delete(pathFileToDelete);
+        if (filePath is not null) File.Delete(filePath);
+        
+        var update =
+            Builders<User>.Update.PullFilter(user => user.Docs, Builders<Document>.Filter.Eq(doc => doc.Id, docId));
+        var deleteResult = await _documentsCollection.UpdateOneAsync(user => user.Id.Equals(userId), update);
+
+
+            //CORRECT VERIFICATION!
+            if (deleteResult is not null)
+            {
+                result.Add("Ok");
+            }
+            else
+            {
+                result.Add("Not ok");
+            }
         }
 
-        var result = await _documentsCollection.FindOneAndUpdateAsync(filter, update);
-        
-        return result;
+    return result;
     }
 
     public async Task<UpdateResult>? ModifyAsync(string userId, string docId, Document modifiedDocument)

@@ -28,6 +28,7 @@
 
     <ItemGroup>
       <Folder Include="Docs" />
+      <Folder Include="Docs\62b4c2742e3e8ddfbf575bcc" />
       <Folder Include="Docs\62c3f19c2540e266f79987d8" />
       <Folder Include="logs" />
     </ItemGroup>
