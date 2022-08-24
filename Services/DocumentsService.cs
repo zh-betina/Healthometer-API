@@ -41,15 +41,34 @@ public class DocumentsService
         return docToSendToDb;
     }
 
-    public async Task<List<Document>>? GetAsync(string id)
+    public async Task<List<Document>>? GetAsync(string userId, string category)
     {
-        var user = await _documentsCollection
-            .Find(e => e.Id == id)
-            .FirstOrDefaultAsync();
-        var docs = user.Docs;
-        return docs;
-    }
+        if (category == "all")
+        {
+            var user = await _documentsCollection
+                .Find(e => e.Id == userId)
+                .FirstOrDefaultAsync();
+            var docs = user.Docs;
+            return docs;
+        }
+        
+        var docFilter = Builders<Document>.Filter.Eq(doc => doc.Category, category);
+        var doc = await _documentsCollection.Find(
+                Builders<User>.Filter.Eq(user => user.Id, userId)
+                & Builders<User>.Filter.ElemMatch(el => el.Docs, docFilter))
+            .Project(
+                Builders<User>.Projection.Include(e => e.Docs)
+                    .Exclude(user => user.Id)
+                    .ElemMatch(user => user.Docs, docFilter)
+            ).SingleOrDefaultAsync();
 
+        BsonValue docsWithCategory = doc["docs"];
+        List<Document> docsJson = BsonSerializer.Deserialize<List<Document>>(docsWithCategory.ToJson());
+
+
+        return docsJson;
+    }
+    
     public async Task<User>? PostAsync(Document newDocument, string userId)
     {
         var docInfoForDatabase = PrepareDocInfoForDatabase(newDocument);

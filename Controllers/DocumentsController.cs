@@ -15,9 +15,9 @@ public class DocumentsController : ControllerBase
         _documentsService = documentsService;
 
     [HttpGet("{id:length(24)}")]
-    public async Task<ActionResult<List<Document>>> Get(string id)
+    public async Task<ActionResult<List<Document>>> Get(string id, string category = "all")
     {
-        var documents = await _documentsService.GetAsync(id);
+        var documents = await _documentsService.GetAsync(id, category);
 
         if (documents is null)
         {
