@@ -51,21 +51,18 @@ public class DocumentsService
             var docs = user.Docs;
             return docs;
         }
-        
-        var docFilter = Builders<Document>.Filter.Eq(doc => doc.Category, category);
-        var doc = await _documentsCollection.Find(
-                Builders<User>.Filter.Eq(user => user.Id, userId)
-                & Builders<User>.Filter.ElemMatch(el => el.Docs, docFilter))
-            .Project(
-                Builders<User>.Projection.Include(e => e.Docs)
-                    .Exclude(user => user.Id)
-                    .ElemMatch(user => user.Docs, docFilter)
-            ).SingleOrDefaultAsync();
 
-        if (doc is not null)
+        var projection = Builders<User>.Projection.Expression(
+            user => user.Docs.Where(doc => doc.Category == category));
+
+        var docsWithCategory = await _documentsCollection
+            .Find(user => user.Id == userId)
+            .Project(projection)
+            .ToListAsync();
+
+        if (docsWithCategory is not null)
         {
-            BsonValue docsWithCategory = doc["docs"];
-            List<Document> docsJson = BsonSerializer.Deserialize<List<Document>>(docsWithCategory.ToJson());
+            List<Document> docsJson = BsonSerializer.Deserialize<List<Document>>(docsWithCategory[0].ToJson());
             return docsJson;
         }
         
