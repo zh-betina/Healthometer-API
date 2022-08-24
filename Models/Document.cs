@@ -15,4 +15,5 @@ public class Document
     [BsonElement("format")] public string? Format { get; set; }
     [BsonElement("category")] public string? Category { get; set; }
     [BsonElement("path")] public string? Path { get; set; }
+    [BsonElement("is_fav")] public bool? IsFav { get; set; } = false;
 }

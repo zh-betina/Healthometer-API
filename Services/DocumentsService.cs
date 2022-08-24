@@ -62,11 +62,14 @@ public class DocumentsService
                     .ElemMatch(user => user.Docs, docFilter)
             ).SingleOrDefaultAsync();
 
-        BsonValue docsWithCategory = doc["docs"];
-        List<Document> docsJson = BsonSerializer.Deserialize<List<Document>>(docsWithCategory.ToJson());
-
-
-        return docsJson;
+        if (doc is not null)
+        {
+            BsonValue docsWithCategory = doc["docs"];
+            List<Document> docsJson = BsonSerializer.Deserialize<List<Document>>(docsWithCategory.ToJson());
+            return docsJson;
+        }
+        
+        return new List<Document>();
     }
     
     public async Task<User>? PostAsync(Document newDocument, string userId)
@@ -99,8 +102,30 @@ public class DocumentsService
         BsonValue docs = doc["docs"];
         List<Document> docObj = BsonSerializer.Deserialize<List<Document>>(docs.ToJson());
         var filePath = docObj[0].Path;
-        
-        if (filePath is not null) File.Delete(filePath);
+
+        if (filePath is not null)
+        {
+            long fileSize = new FileInfo(filePath).Length;
+            var user = await _documentsCollection
+                .Find(e => e.Id == userId)
+                .FirstOrDefaultAsync();
+            var totalSizeUsed = user.TakenSpace;
+            
+            try
+            {
+                File.Delete(filePath);
+                var newTotalSizeUsed = totalSizeUsed - fileSize;
+                var updateFilter = Builders<User>.Filter.Eq(user => user.Id, userId);
+                var updateTotalSizeUsed = Builders<User>.Update.Set(user => user.TakenSpace, newTotalSizeUsed);
+
+                await _documentsCollection.UpdateOneAsync(updateFilter, updateTotalSizeUsed);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
         
         var update =
             Builders<User>.Update.PullFilter(user => user.Docs, Builders<Document>.Filter.Eq(doc => doc.Id, docId));
@@ -121,6 +146,7 @@ public class DocumentsService
     return result;
     }
 
+    //FIX THIS
     public async Task<UpdateResult>? ModifyAsync(string userId, string docId, Document modifiedDocument)
     {
         var filter = Builders<User>.Filter.Eq(user => user.Id, userId)
