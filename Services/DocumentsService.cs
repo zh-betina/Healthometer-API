@@ -146,11 +146,20 @@ public class DocumentsService
     //FIX THIS
     public async Task<UpdateResult>? ModifyAsync(string userId, string docId, Document modifiedDocument)
     {
-        var filter = Builders<User>.Filter.Eq(user => user.Id, userId)
-                     & Builders<User>.Filter.ElemMatch(user => user.Docs, Builders<Document>.Filter.Eq(document =>
-                         document.Id, docId));
-        var update = Builders<User>.Update.Set(user => user.Docs[-1], modifiedDocument);
-        var result = await _documentsCollection.UpdateOneAsync(filter, update);
+        // var filter = Builders<User>.Filter.Eq(user => user.Id, userId)
+        //              & Builders<User>.Filter.ElemMatch(user => user.Docs, Builders<Document>.Filter.Eq(document =>
+        //                  document.Id, docId));
+        // var update = Builders<User>.Update.Set(user => user.Docs[-1], modifiedDocument);
+        // var result = await _documentsCollection.UpdateOneAsync(filter, update);
+        
+        var filter = Builders<User>.Filter;
+        var userIdAndDocFilter = filter.And(
+            filter.Eq(user => user.Id, userId),
+            filter.ElemMatch(user => user.Docs, doc => doc.Id == docId));
+
+        var update = Builders<User>.Update;
+        var docUpdate = update.Set(user => user.Docs[-1], modifiedDocument);
+        var result = await _documentsCollection.UpdateOneAsync(userIdAndDocFilter, docUpdate);
         return result;
     }
 }
