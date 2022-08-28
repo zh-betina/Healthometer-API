@@ -1,6 +1,7 @@
 using Healthometer_API.Models;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 
 namespace Healthometer_API.Services;
@@ -24,17 +25,40 @@ public class FamilyMemberService
 
     public async Task<List<FamilyMember>> GetAsync(string userId)
     {
-        var familyMembers = await _familyMembersCollection.Find(
-                Builders<User>.Filter.Eq(user => user.Id, userId))
+        var projection = Builders<User>.Projection
+            .Exclude("_id")
+            .Include("family");
+
+        var familyMembers = await _familyMembersCollection
+            .Find(user => user.Id == userId)
+            .Project(projection)
             .FirstOrDefaultAsync();
-            //REFACTOR LATER - FIND OUT HOW TO CAST FROM BSON DOCUMENT...
-            // .Project(
-            //     Builders<User>.Projection
-            //         .Include(user => user.FamilyMembers)
-            //         .Exclude(user => user.Id))
-            // .ToListAsync();
+
+        List<FamilyMember> familyMembersList = BsonSerializer.Deserialize<List<FamilyMember>>(familyMembers[0].ToJson());
+
+        return familyMembersList;
+    }
+    
+    public async Task<List<Document>> GetDocsAsync(string userId, string familyId)
+    {
+        var projection = Builders<User>.Projection.Expression(
+            user => user.FamilyMembers.Where(family => family.Id == familyId));
+
+        var familyMember = await _familyMembersCollection
+            .Find(user => user.Id == userId)
+            .Project(projection)
+            .FirstOrDefaultAsync();
         
-        return familyMembers.FamilyMembers;
+        List<FamilyMember> familyMemberList = familyMember.ToList();
+        List<Document> familyDocs = familyMemberList[0].Docs;
+
+        if (familyMember is not null)
+        {
+            FamilyMember familyJson = BsonSerializer.Deserialize<FamilyMember>(familyMemberList[0].ToJson());
+            return familyJson.Docs;
+        }
+        
+        return familyDocs;
     }
 
     public async Task<string> PostAsync(string userId, FamilyMember newFamilyMember)

@@ -6,7 +6,7 @@ using MongoDB.Bson;
 namespace Healthometer_API.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/[controller]/")]
 
 public class FamilyMemberController : ControllerBase
 {
@@ -25,6 +25,19 @@ public class FamilyMemberController : ControllerBase
             return NoContent();
         }
 
+        return familyMembers;
+    }
+    
+    [HttpGet("Documents/{userId:length(24)}&{familyId:length(24)}")]
+    public async Task<List<Document>> GetDocs(string userId, string familyId)
+    {
+        var familyMembers = await _familyMemberService.GetDocsAsync(userId, familyId);
+    
+        if (familyMembers is null)
+        {
+            return new List<Document>();
+        }
+    
         return familyMembers;
     }
 

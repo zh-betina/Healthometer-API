@@ -43,29 +43,29 @@ public class DocumentsService
 
     public async Task<List<Document>>? GetAsync(string userId, string category)
     {
-        if (category == "all")
-        {
-            var user = await _documentsCollection
-                .Find(e => e.Id == userId)
-                .FirstOrDefaultAsync();
-            var docs = user.Docs;
-            return docs;
-        }
+            if (category == "all")
+            {
+                var user = await _documentsCollection
+                    .Find(e => e.Id == userId)
+                    .FirstOrDefaultAsync();
+                var docs = user.Docs;
+                return docs;
+            }
 
-        var projection = Builders<User>.Projection.Expression(
-            user => user.Docs.Where(doc => doc.Category == category));
+            var projection = Builders<User>.Projection.Expression(
+                user => user.Docs.Where(doc => doc.Category == category));
 
-        var docsWithCategory = await _documentsCollection
-            .Find(user => user.Id == userId)
-            .Project(projection)
-            .ToListAsync();
+            var docsWithCategory = await _documentsCollection
+                .Find(user => user.Id == userId)
+                .Project(projection)
+                .ToListAsync();
 
-        if (docsWithCategory is not null)
-        {
-            List<Document> docsJson = BsonSerializer.Deserialize<List<Document>>(docsWithCategory[0].ToJson());
-            return docsJson;
-        }
-        
+            if (docsWithCategory is not null)
+            {
+                List<Document> docsJson = BsonSerializer.Deserialize<List<Document>>(docsWithCategory[0].ToJson());
+                return docsJson;
+            } 
+            
         return new List<Document>();
     }
     
