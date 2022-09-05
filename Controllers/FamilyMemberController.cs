@@ -40,6 +40,19 @@ public class FamilyMemberController : ControllerBase
     
         return familyMembers;
     }
+    
+    [HttpPost("Documents/{userId:length(24)}&{familyId:length(24)}")]
+    public async Task<string> PostDocAsync(string userId, string familyId, [FromForm] DocFile fileForm)
+    {
+        var update = await _familyMemberService.PostDocAsync(userId, familyId, fileForm);
+
+        if (update == "ok")
+        {
+            return "Ok, it's done";
+        }
+
+        return "Not ok";
+    }
 
     [HttpPost]
     public async Task<string> Post(string userId, FamilyMember newFamilyMember)

@@ -30,18 +30,18 @@ public class FileService
         _documentsService = documentsService;
     }
 
-    private void CreateDirectoryForUser()
+    public void CreateDirectoryForUser(string user)
     {
         var allUsersDir = Path.Combine(Directory.GetCurrentDirectory(), "Docs");
-        var userDir = Path.Combine(allUsersDir, _user);
+        var userDir = Path.Combine(allUsersDir, user);
 
         if (Directory.Exists(userDir)) return;
         Directory.CreateDirectory(userDir);
     }
 
-    private async Task<bool> UpdateTakenSpace(string operation, long size)
+    public async Task<bool> UpdateTakenSpace(string userId, string operation, long size)
     {
-        var user = await _documentsCollection.Find(user => user.Id == _user).FirstOrDefaultAsync();
+        var user = await _documentsCollection.Find(user => user.Id == userId).FirstOrDefaultAsync();
         var potentialSpaceToTake = size + user.TakenSpace;
 
         if (MaxSize > size && MaxSize > potentialSpaceToTake)
@@ -57,7 +57,7 @@ public class FileService
     public async Task<Document> OnPostUploadAsync(string userId, DocFile docFile)
     {
         _user = userId;
-        CreateDirectoryForUser();
+        CreateDirectoryForUser(userId);
         
         IFormFile file = docFile.FileContent;
         var docInfo = docFile.DocumentInfo;
@@ -71,13 +71,13 @@ public class FileService
         //TODO refactor: should rather first check if size will be ok and then try to insert the file
         if (file.Length > 0)
         {
-            var takenSpaceUpdateResult = await UpdateTakenSpace("sth", fileSize);
+            var takenSpaceUpdateResult = await UpdateTakenSpace(userId, "sth", fileSize);
             if (takenSpaceUpdateResult)
             {
                 await using var stream = new FileStream(pathToSave, FileMode.Create);
                 file.CopyTo(stream);
 
-                UpdateTakenSpace("sth", fileSize);
+                UpdateTakenSpace(userId, "sth", fileSize);
                 Document doc = new Document
                 {
                     Id = ObjectId.GenerateNewId().ToString(),
